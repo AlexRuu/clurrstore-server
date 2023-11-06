@@ -45,7 +45,7 @@ model Product {
   isArchived  Boolean
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
-  orderItem   orderItem[]
+  orderItem   OrderItem[]
 }
 
 model Image {
@@ -86,10 +86,10 @@ model Order {
   profile     Profile     @relation(fields: [profileId], references: [id])
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
-  orderItem   orderItem[]
+  orderItem   OrderItem[]
 }
 
-model orderItem {
+model OrderItem {
   id        String  @id @default(uuid())
   productId String
   product   Product @relation(fields: [productId], references: [id])
