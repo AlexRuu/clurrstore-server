@@ -1,0 +1,98 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Profile {
+  id        String   @id @default(uuid())
+  userId    String
+  email     String
+  firstName String
+  lastName  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  order     Order[]
+}
+
+model Category {
+  id        String    @id @default(uuid())
+  title     String
+  product   Product[] @relation("ProductToCategory")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Product {
+  id          String      @id @default(uuid())
+  title       String
+  price       Float
+  stock       Int
+  categoryId  String
+  description String
+  details     Detail[]
+  category    Category    @relation("ProductToCategory", fields: [categoryId], references: [id])
+  style       Style[]
+  design      Design[]
+  image       Image[]
+  isFeatured  Boolean
+  isArchived  Boolean
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  orderItem   orderItem[]
+}
+
+model Image {
+  id        String   @id @default(uuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Design {
+  id        String  @id @default(uuid())
+  title     String
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  stock     Int
+}
+
+model Style {
+  id        String  @id @default(uuid())
+  title     String
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Detail {
+  id        String   @id @default(uuid())
+  text      String
+  Product   Product? @relation(fields: [productId], references: [id])
+  productId String?
+}
+
+model Order {
+  id          String      @id @default(uuid())
+  orderNumber String
+  profileId   String
+  profile     Profile     @relation(fields: [profileId], references: [id])
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  orderItem   orderItem[]
+}
+
+model orderItem {
+  id        String  @id @default(uuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id])
+}
