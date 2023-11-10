@@ -276,7 +276,12 @@ const ProductForm: React.FC<ProductFormProps> = ({
                       <FormItem className="w-11/12">
                         <FormLabel>Title</FormLabel>
                         <FormControl>
-                          <Input placeholder="" disabled={loading} {...field} />
+                          <Input
+                            placeholder=""
+                            disabled={loading}
+                            {...field}
+                            value={field.value}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

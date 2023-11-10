@@ -24,6 +24,8 @@ export async function PATCH(
       categoryId,
       isFeatured,
       isArchived,
+      description,
+      detail,
     } = body;
 
     if (!user) {
@@ -54,6 +56,10 @@ export async function PATCH(
       return new NextResponse("Please provide stock", { status: 400 });
     }
 
+    if (!description) {
+      return new NextResponse("Please provide a description", { status: 400 });
+    }
+
     await prismadb.product.update({
       where: { id: params.productId },
       data: {
@@ -69,9 +75,13 @@ export async function PATCH(
         style: {
           deleteMany: {},
         },
+        detail: {
+          deleteMany: {},
+        },
         categoryId,
         isFeatured,
         isArchived,
+        description,
       },
     });
 
@@ -93,6 +103,11 @@ export async function PATCH(
         style: {
           createMany: {
             data: [...style.map((item: { title: string }) => item)],
+          },
+        },
+        detail: {
+          createMany: {
+            data: [...detail.map((item: { text: string }) => item)],
           },
         },
       },

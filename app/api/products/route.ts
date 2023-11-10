@@ -11,11 +11,13 @@ export async function POST(req: Request) {
       price,
       image,
       stock,
+      detail,
       design,
       style,
       categoryId,
       isFeatured,
       isArchived,
+      description,
     } = body;
 
     const supabase = createServerComponentClient({ cookies });
@@ -47,6 +49,10 @@ export async function POST(req: Request) {
       return new NextResponse("Please provide stock", { status: 400 });
     }
 
+    if (!description) {
+      return new NextResponse("Please provide a description", { status: 400 });
+    }
+
     const product = await prismadb.product.create({
       data: {
         title,
@@ -55,6 +61,12 @@ export async function POST(req: Request) {
         categoryId,
         isArchived,
         isFeatured,
+        description,
+        detail: {
+          createMany: {
+            data: [...detail.map((item: { text: string }) => item)],
+          },
+        },
         design: {
           createMany: {
             data: [

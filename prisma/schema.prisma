@@ -16,9 +16,9 @@ model Profile {
   email     String
   firstName String
   lastName  String
+  order     Order[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  order     Order[]
 }
 
 model Category {
@@ -36,16 +36,16 @@ model Product {
   stock       Int
   categoryId  String
   description String
-  details     Detail[]
+  detail      Detail[]
   category    Category    @relation("ProductToCategory", fields: [categoryId], references: [id])
   style       Style[]
   design      Design[]
   image       Image[]
+  orderItem   orderItem[]
   isFeatured  Boolean
   isArchived  Boolean
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
-  orderItem   orderItem[]
 }
 
 model Image {
@@ -82,11 +82,14 @@ model Detail {
 model Order {
   id          String      @id @default(uuid())
   orderNumber String
-  profileId   String
-  profile     Profile     @relation(fields: [profileId], references: [id])
+  isPaid      Boolean
+  profileId   String?
+  profile     Profile?    @relation(fields: [profileId], references: [id])
+  address     String      @default("")
+  phone       String      @default("")
+  orderItem   orderItem[]
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
-  orderItem   orderItem[]
 }
 
 model orderItem {
