@@ -1,12 +1,13 @@
 import prismadb from "@/lib/prismadb";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 
 import LogoutButton from "@/components/logout-button";
 import NavLinks from "@/components/nav-links";
 
 const Navbar = async () => {
-  const supabase = createServerComponentClient({ cookies });
+  const cookieStore = cookies()
+  const supabase = createClient(cookieStore);
 
   const {
     data: { user },

@@ -1,6 +1,6 @@
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 
 import { stripe } from "@/lib/stripe";
@@ -25,7 +25,9 @@ export async function OPTIONS() {
 
 export async function POST(req: Request) {
   try {
-    const supabase = createServerComponentClient({ cookies });
+    const cookieStore = cookies()
+    const supabase = createClient(cookieStore);
+    
     const {
       data: { user },
     } = await supabase.auth.getUser();

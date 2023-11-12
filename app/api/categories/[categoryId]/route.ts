@@ -1,5 +1,5 @@
 import prismadb from "@/lib/prismadb";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
@@ -10,7 +10,10 @@ export async function PATCH(
   try {
     const body = await req.json();
     const { title } = body;
-    const supabase = createServerComponentClient({ cookies });
+    
+    const cookieStore = cookies()
+    const supabase = createClient(cookieStore);
+    
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -43,11 +46,12 @@ export async function DELETE(
   { params }: { params: { categoryId: string } }
 ) {
   try {
-    const supabase = createServerComponentClient({ cookies });
+    const cookieStore = cookies()
+    const supabase = createClient(cookieStore);
+  
     const {
       data: { user },
     } = await supabase.auth.getUser();
-
     if (!user) {
       return new NextResponse("Unauthenticated", { status: 401 });
     }
