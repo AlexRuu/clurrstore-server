@@ -3,14 +3,24 @@ import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
+export async function GET(_req: Request) {
+  try {
+    const categories = await prismadb.category.findMany({});
+    return NextResponse.json(categories);
+  } catch (error) {
+    console.log("[CATEGORIES_GET] error", error);
+    return new NextResponse("Could not fetch categories", { status: 500 });
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { title } = body;
 
-    const cookieStore = cookies()
+    const cookieStore = cookies();
     const supabase = createClient(cookieStore);
-    
+
     const {
       data: { user },
     } = await supabase.auth.getUser();

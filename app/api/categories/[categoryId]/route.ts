@@ -10,10 +10,10 @@ export async function PATCH(
   try {
     const body = await req.json();
     const { title } = body;
-    
-    const cookieStore = cookies()
+
+    const cookieStore = cookies();
     const supabase = createClient(cookieStore);
-    
+
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -46,9 +46,9 @@ export async function DELETE(
   { params }: { params: { categoryId: string } }
 ) {
   try {
-    const cookieStore = cookies()
+    const cookieStore = cookies();
     const supabase = createClient(cookieStore);
-  
+
     const {
       data: { user },
     } = await supabase.auth.getUser();
