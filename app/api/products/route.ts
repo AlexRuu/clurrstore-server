@@ -3,6 +3,25 @@ import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
+export async function GET(_req: Request) {
+  try {
+    const products = await prismadb.product.findMany({
+      include: {
+        image: true,
+        design: true,
+        style: true,
+        category: true,
+        detail: true,
+      },
+    });
+
+    return NextResponse.json(products);
+  } catch (error) {
+    console.log("[PRODUCT_GET] error", error);
+    return new NextResponse("Internal Product GET error", { status: 500 });
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -20,9 +39,9 @@ export async function POST(req: Request) {
       description,
     } = body;
 
-    const cookieStore = cookies()
+    const cookieStore = cookies();
     const supabase = createClient(cookieStore);
-    
+
     const {
       data: { user },
     } = await supabase.auth.getUser();

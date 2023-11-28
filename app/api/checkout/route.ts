@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 
 import { stripe } from "@/lib/stripe";
 import prismadb from "@/lib/prismadb";
+import { Prisma } from "@prisma/client";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -25,9 +26,9 @@ export async function OPTIONS() {
 
 export async function POST(req: Request) {
   try {
-    const cookieStore = cookies()
+    const cookieStore = cookies();
     const supabase = createClient(cookieStore);
-    
+
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -61,9 +62,27 @@ export async function POST(req: Request) {
       });
     });
 
+    let randomNumber = randomOrderNumber();
+
+    let existingOrder = await prismadb.order.findFirst({
+      where: {
+        orderNumber: randomNumber,
+      },
+    });
+
+    while (existingOrder) {
+      randomNumber = randomOrderNumber();
+
+      existingOrder = await prismadb.order.findFirst({
+        where: {
+          orderNumber: randomNumber,
+        },
+      });
+    }
+
     const order = await prismadb.order.create({
       data: {
-        orderNumber: randomOrderNumber(),
+        orderNumber: randomNumber,
         isPaid: false,
         orderItem: {
           create: productIds.map((productId: string) => ({
@@ -76,7 +95,6 @@ export async function POST(req: Request) {
         },
       },
     });
-
     const session = await stripe.checkout.sessions.create({
       line_items,
       mode: "payment",

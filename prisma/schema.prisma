@@ -34,10 +34,10 @@ model Product {
   title       String
   price       Float
   stock       Int
-  categoryId  String
   description String
-  detail      Detail[]
+  categoryId  String
   category    Category    @relation("ProductToCategory", fields: [categoryId], references: [id])
+  detail      Detail[]
   style       Style[]
   design      Design[]
   image       Image[]
@@ -96,6 +96,6 @@ model orderItem {
   id        String  @id @default(uuid())
   productId String
   product   Product @relation(fields: [productId], references: [id])
-  orderId   String
+  orderId   String  @unique
   order     Order   @relation(fields: [orderId], references: [id])
 }

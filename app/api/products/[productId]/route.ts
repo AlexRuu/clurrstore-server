@@ -3,12 +3,37 @@ import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
+export async function GET(
+  req: Request,
+  { params }: { params: { productId: string } }
+) {
+  try {
+    const product = await prismadb.product.findFirst({
+      where: {
+        id: params.productId,
+      },
+      include: {
+        image: true,
+        design: true,
+        style: true,
+        category: true,
+        detail: true,
+      },
+    });
+
+    return NextResponse.json(product);
+  } catch (error) {
+    console.log("[SINGLE_PRODUCT_GET] error", error);
+    return new NextResponse("Could not get product", { status: 500 });
+  }
+}
+
 export async function PATCH(
   req: Request,
   { params }: { params: { productId: string } }
 ) {
   try {
-    const cookieStore = cookies()
+    const cookieStore = cookies();
     const supabase = createClient(cookieStore);
 
     const {
@@ -127,7 +152,7 @@ export async function DELETE(
   { params }: { params: { productId: string } }
 ) {
   try {
-    const cookieStore = cookies()
+    const cookieStore = cookies();
     const supabase = createClient(cookieStore);
 
     const {
