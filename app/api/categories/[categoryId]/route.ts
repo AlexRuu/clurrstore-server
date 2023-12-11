@@ -3,6 +3,32 @@ import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
+export async function GET(
+  _req: Request,
+  { params }: { params: { categoryTitle: string } }
+) {
+  try {
+    if (!params.categoryTitle) {
+      return new NextResponse("Please provide a category title", {
+        status: 401,
+      });
+    }
+    const category = await prismadb.category.findFirst({
+      where: {
+        title: params.categoryTitle,
+      },
+      include: {
+        product: true,
+      },
+    });
+
+    return NextResponse.json(category);
+  } catch (error) {
+    console.log("[CATEGORY_GET] error", error);
+    return new NextResponse("Unable to get category", { status: 500 });
+  }
+}
+
 export async function PATCH(
   req: Request,
   { params }: { params: { categoryId: string } }

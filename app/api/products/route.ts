@@ -3,15 +3,34 @@ import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-export async function GET(_req: Request) {
+export async function GET(req: Request) {
   try {
+    const { searchParams } = new URL(req.url);
+
+    const categoryId = searchParams.get("categoryId") || undefined;
+    const sort = searchParams.get("sort") || undefined;
+    const isFeatured = searchParams.get("featured") || undefined;
+
+    const order: any = {};
+    if (sort) {
+      const splitted = sort.split("-");
+      order[splitted[0]] = splitted[1];
+    }
+
     const products = await prismadb.product.findMany({
+      where: {
+        categoryId,
+        isFeatured: isFeatured ? true : undefined,
+      },
       include: {
         image: true,
+        detail: true,
         design: true,
         style: true,
         category: true,
-        detail: true,
+      },
+      orderBy: {
+        ...(sort ? order : ""),
       },
     });
 
