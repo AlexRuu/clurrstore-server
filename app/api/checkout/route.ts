@@ -5,7 +5,6 @@ import { cookies } from "next/headers";
 
 import { stripe } from "@/lib/stripe";
 import prismadb from "@/lib/prismadb";
-import { Prisma } from "@prisma/client";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
