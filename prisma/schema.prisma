@@ -99,3 +99,10 @@ model orderItem {
   orderId   String  @unique
   order     Order   @relation(fields: [orderId], references: [id])
 }
+
+model HomeImage {
+  id        String   @id @default(uuid())
+  url       String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

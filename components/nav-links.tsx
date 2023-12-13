@@ -9,6 +9,11 @@ const NavLinks = () => {
 
   const links = [
     { href: "/", label: "Overview", active: pathname === "/" },
+    {
+      href: "/homeImgs",
+      label: "Home Images",
+      active: pathname === "/homeImgs",
+    },
     { href: "/products", label: "Products", active: pathname === "/products" },
     {
       href: "/categories",

@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import axios from "axios";
-import { CategoryColumn } from "./columns";
+import { HomeImgsColumn } from "./columns";
 import toast from "react-hot-toast";
 
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,7 @@ import { useState } from "react";
 import AlertModal from "@/components/alert-modal";
 
 interface CellActionProps {
-  data: CategoryColumn;
+  data: HomeImgsColumn;
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
@@ -31,11 +31,11 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const onDelete = async () => {
     try {
       setLoading(true);
-      await axios.delete(`/api/categories/${data.id}`);
+      await axios.delete(`/api/homeImgs/${data.id}`);
       router.refresh();
-      toast.success("Category deleted");
+      toast.success("Home image deleted");
     } catch (error) {
-      toast.error("Make sure you removed all products using this category");
+      toast.error("Something went wrong...");
     } finally {
       setLoading(false);
       setOpen(false);
@@ -59,9 +59,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuItem
-            onClick={() => router.push(`/categories/${data.id}`)}
-          >
+          <DropdownMenuItem onClick={() => router.push(`/homeImgs/${data.id}`)}>
             <Edit className="mr-2 h-4 w-4" />
             Edit
           </DropdownMenuItem>
