@@ -34,7 +34,7 @@ export async function PATCH(
     } = await supabase.auth.getUser();
 
     const body = await req.json();
-    const { url } = body;
+    const { url, title, description } = body;
 
     if (!user) {
       return new NextResponse("Unauthenticated", { status: 401 });
@@ -45,6 +45,8 @@ export async function PATCH(
         id: params.homeImgId,
       },
       data: {
+        title,
+        description,
         url,
       },
     });

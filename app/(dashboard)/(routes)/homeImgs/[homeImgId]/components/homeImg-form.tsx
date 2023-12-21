@@ -10,6 +10,7 @@ import { HomeImage } from "@prisma/client";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -25,8 +26,11 @@ import { Trash } from "lucide-react";
 import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
 import ImageUpload from "@/components/ui/image-upload";
+import { Textarea } from "@/components/ui/textarea";
 
 const formSchema = z.object({
+  title: z.string().min(1),
+  description: z.string().min(1),
   url: z.string().min(1),
 });
 
@@ -124,6 +128,44 @@ const HomeImgForm: React.FC<HomeImageFormProps> = ({ initialData }) => {
             onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-8 w-1/4"
           >
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Title</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Title"
+                      disabled={loading}
+                      {...field}
+                      value={field.value}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormDescription>
+                    Provide a description of the item
+                  </FormDescription>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Please enter a description"
+                      {...field}
+                      disabled={loading}
+                      value={field.value}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="url"

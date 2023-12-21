@@ -6,6 +6,7 @@ import Image from "next/image";
 
 export type HomeImgsColumn = {
   id: string;
+  title: string;
   url: string;
   createdAt: string;
 };
@@ -27,6 +28,10 @@ export const columns: ColumnDef<HomeImgsColumn>[] = [
         }
       }
     },
+  },
+  {
+    accessorKey: "title",
+    header: "Title",
   },
   { accessorKey: "createdAt", header: "Date Created" },
   {

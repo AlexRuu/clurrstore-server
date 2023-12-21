@@ -13,6 +13,7 @@ const HomeImgsPage = async () => {
 
   const formattedHomeImgs: HomeImgsColumn[] = homeimgs.map((item) => ({
     id: item.id,
+    title: item.title,
     url: item.url,
     createdAt: format(item.createdAt, "MMM do, yyyy"),
   }));

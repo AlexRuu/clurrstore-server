@@ -16,7 +16,7 @@ export async function GET(_req: Request) {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { url } = body;
+    const { url, title, description } = body;
 
     const cookieStore = cookies();
     const supabase = createClient(cookieStore);
@@ -31,6 +31,8 @@ export async function POST(req: Request) {
 
     const product = await prismadb.homeImage.create({
       data: {
+        title,
+        description,
         url,
       },
     });

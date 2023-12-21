@@ -6,7 +6,7 @@ import LogoutButton from "@/components/logout-button";
 import NavLinks from "@/components/nav-links";
 
 const Navbar = async () => {
-  const cookieStore = cookies()
+  const cookieStore = cookies();
   const supabase = createClient(cookieStore);
 
   const {
