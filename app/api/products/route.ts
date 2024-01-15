@@ -7,6 +7,7 @@ export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
 
+    const productId = searchParams.getAll("productId") || undefined;
     const categoryId = searchParams.getAll("categoryId") || undefined;
     const sort = searchParams.get("sort") || undefined;
     const isFeatured = searchParams.get("featured") || undefined;
@@ -19,7 +20,8 @@ export async function GET(req: Request) {
 
     const products = await prismadb.product.findMany({
       where: {
-        categoryId: { in: categoryId },
+        id: productId.length > 0 ? { in: productId } : undefined,
+        categoryId: categoryId.length > 0 ? { in: categoryId } : undefined,
         isFeatured: isFeatured ? true : undefined,
       },
       include: {
