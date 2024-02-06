@@ -11,12 +11,16 @@ export async function GET(req: Request) {
       editedSearchQuery = searchQuery.replace(/-/g, " ");
     }
 
+    console.log(searchQuery);
     const products = await prismadb.product.findMany({
       where: {
-        title: {
-          contains: editedSearchQuery,
-          mode: "insensitive",
-        },
+        title:
+          searchQuery != undefined
+            ? {
+                contains: editedSearchQuery,
+                mode: "insensitive",
+              }
+            : "",
       },
       include: {
         image: true,
