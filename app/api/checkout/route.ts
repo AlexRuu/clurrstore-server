@@ -43,16 +43,16 @@ export async function POST(req: Request) {
     const products = await prismadb.product.findMany({
       where: {
         id: body[0].id,
-        design: { some: { id: body[0].selectedDesign } },
-        style: { some: { id: body[0].selectedStyle } },
       },
-      include: {
-        design: true,
-        style: true,
+      select: {
+        title: true,
+        design: {
+          select: {
+            title: true,
+          },
+        },
       },
     });
-
-    console.log(products);
 
     // const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
 
