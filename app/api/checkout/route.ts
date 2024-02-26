@@ -34,25 +34,41 @@ export async function POST(req: Request) {
 
     const body = await req.json();
 
-    // if (!productIds || productIds.length === 0) {
-    //   return new NextResponse("Please make sure your cart is not empty", {
-    //     status: 400,
-    //   });
-    // }
+    if (!body || body.length === 0) {
+      return new NextResponse("Please make sure your cart is not empty", {
+        status: 400,
+      });
+    }
 
-    const products = await prismadb.product.findMany({
+    let ids = [];
+    let designIds = [];
+    let styleIds = [];
+
+    for (let i = 0; i < body.length; i++) {
+      ids.push(body[i].id);
+    }
+    for (let i = 0; i < body.length; i++) {
+      if (body[i].selectedDesign) {
+        designIds.push(body[i].selectedDesign);
+      }
+    }
+    for (let i = 0; i < body.length; i++) {
+      if (body[i].selectedStyle) {
+        styleIds.push(body[i].selectedStyle);
+      }
+    }
+
+    const product = await prismadb.product.findMany({
       where: {
-        id: body[0].id,
+        id: { in: ids },
       },
       select: {
         title: true,
-        design: {
-          select: {
-            title: true,
-          },
-        },
+        design: { where: { id: { in: designIds } } },
+        style: { where: { id: { in: styleIds } } },
       },
     });
+    console.log(product);
 
     // const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
 
