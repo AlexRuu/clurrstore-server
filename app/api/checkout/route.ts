@@ -94,7 +94,7 @@ export async function POST(req: Request) {
           currency: "CAD",
           product_data: { name: item.title },
           unit_amount:
-            item.style[0].title == "B Grade (-C$2.00)"
+            item.style[0]?.title == "B Grade (-C$2.00)"
               ? (item.price - 2) * 100
               : item.price * 100,
         },
@@ -130,16 +130,22 @@ export async function POST(req: Request) {
                 id: product.id,
               },
             },
-            design: {
-              connect: {
-                id: product.design[0].id,
-              },
-            },
-            style: {
-              connect: {
-                id: product.style[0].id,
-              },
-            },
+            design:
+              product.design.length > 0
+                ? {
+                    connect: {
+                      id: product.design[0].id,
+                    },
+                  }
+                : undefined,
+            style:
+              product.style.length > 0
+                ? {
+                    connect: {
+                      id: product.style[0].id,
+                    },
+                  }
+                : undefined,
           })),
         },
       },
