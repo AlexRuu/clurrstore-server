@@ -58,18 +58,20 @@ model Image {
 }
 
 model Design {
-  id        String  @id @default(uuid())
+  id        String      @id @default(uuid())
   title     String
   productId String
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product   Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
   stock     Int
+  orderItem orderItem[]
 }
 
 model Style {
-  id        String  @id @default(uuid())
+  id        String      @id @default(uuid())
   title     String
   productId String
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product   Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  orderItem orderItem[]
 }
 
 model Detail {
@@ -95,9 +97,13 @@ model Order {
 model orderItem {
   id        String  @id @default(uuid())
   productId String
-  product   Product @relation(fields: [productId], references: [id])
-  orderId   String  @unique
-  order     Order   @relation(fields: [orderId], references: [id])
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  designId  String
+  design    Design  @relation(fields: [designId], references: [id], onDelete: Cascade)
+  styleId   String
+  style     Style   @relation(fields: [styleId], references: [id], onDelete: Cascade)
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }
 
 model HomeImage {
