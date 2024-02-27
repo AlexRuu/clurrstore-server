@@ -63,7 +63,10 @@ export async function POST(req: Request) {
         id: { in: ids },
       },
       select: {
+        id: true,
         title: true,
+        price: true,
+        stock: true,
         design: { where: { id: { in: designIds } } },
         style: { where: { id: { in: styleIds } } },
       },
