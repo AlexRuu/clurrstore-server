@@ -58,7 +58,7 @@ export async function POST(req: Request) {
       }
     }
 
-    const product = await prismadb.product.findMany({
+    const products = await prismadb.product.findMany({
       where: {
         id: { in: ids },
       },
@@ -67,75 +67,101 @@ export async function POST(req: Request) {
         title: true,
         price: true,
         stock: true,
-        design: { where: { id: { in: designIds } } },
-        style: { where: { id: { in: styleIds } } },
+        design: {
+          where: { id: { in: designIds } },
+          select: { id: true, title: true },
+        },
+        style: {
+          where: { id: { in: styleIds } },
+          select: { id: true, title: true },
+        },
       },
     });
-    console.log(product);
 
-    // const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
+    products.forEach((item) => {
+      const quantity = body.find((obj: any) => obj.id === item.id).quantity;
+      // @ts-expect-error
+      item.quantity = quantity;
+    });
 
-    // products.forEach((item) => {
-    //   line_items.push({
-    //     quantity: 1,
-    //     price_data: {
-    //       currency: "CAD",
-    //       product_data: { name: item.title },
-    //       unit_amount: item.price * 100,
-    //     },
-    //   });
-    // });
+    const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
 
-    // let randomNumber = randomOrderNumber();
+    products.forEach((item) => {
+      line_items.push({
+        // @ts-expect-error
+        quantity: item.quantity,
+        price_data: {
+          currency: "CAD",
+          product_data: { name: item.title },
+          unit_amount:
+            item.style[0].title == "B Grade (-C$2.00)"
+              ? (item.price - 2) * 100
+              : item.price * 100,
+        },
+      });
+    });
 
-    // let existingOrder = await prismadb.order.findFirst({
-    //   where: {
-    //     orderNumber: randomNumber,
-    //   },
-    // });
+    let randomNumber = randomOrderNumber();
 
-    // while (existingOrder) {
-    //   randomNumber = randomOrderNumber();
+    let existingOrder = await prismadb.order.findFirst({
+      where: {
+        orderNumber: randomNumber,
+      },
+    });
 
-    //   existingOrder = await prismadb.order.findFirst({
-    //     where: {
-    //       orderNumber: randomNumber,
-    //     },
-    //   });
-    // }
+    while (existingOrder) {
+      randomNumber = randomOrderNumber();
 
-    // const order = await prismadb.order.create({
-    //   data: {
-    //     orderNumber: randomNumber,
-    //     isPaid: false,
-    //     orderItem: {
-    //       create: productIds.map((productId: string) => ({
-    //         product: {
-    //           connect: {
-    //             id: productId,
-    //           },
-    //         },
-    //       })),
-    //     },
-    //   },
-    // });
-    // const session = await stripe.checkout.sessions.create({
-    //   line_items,
-    //   mode: "payment",
-    //   billing_address_collection: "required",
-    //   success_url: `${process.env.FRONTEND_STORE_URL}/cart?success=true`,
-    //   cancel_url: `${process.env.FRONTEND_STORE_URL}/cart?canceled=true`,
-    //   metadata: {
-    //     orderNumber: order.orderNumber,
-    //     orderId: order.id,
-    //   },
-    // });
-    // return NextResponse.json(
-    //   {
-    //     url: session.url,
-    //   },
-    //   { headers: corsHeaders }
-    // );
+      existingOrder = await prismadb.order.findFirst({
+        where: {
+          orderNumber: randomNumber,
+        },
+      });
+    }
+
+    const order = await prismadb.order.create({
+      data: {
+        orderNumber: randomNumber,
+        isPaid: false,
+        orderItem: {
+          create: products.map((product) => ({
+            product: {
+              connect: {
+                id: product.id,
+              },
+            },
+            design: {
+              connect: {
+                id: product.design[0].id,
+              },
+            },
+            style: {
+              connect: {
+                id: product.style[0].id,
+              },
+            },
+          })),
+        },
+      },
+    });
+
+    const session = await stripe.checkout.sessions.create({
+      line_items,
+      mode: "payment",
+      billing_address_collection: "required",
+      success_url: `${process.env.FRONTEND_STORE_URL}/cart?success=true`,
+      cancel_url: `${process.env.FRONTEND_STORE_URL}/cart?canceled=true`,
+      metadata: {
+        orderNumber: order.orderNumber,
+        orderId: order.id,
+      },
+    });
+    return NextResponse.json(
+      {
+        url: session.url,
+      },
+      { headers: corsHeaders }
+    );
   } catch (error) {
     console.log("[CHECKOUT_ERROR]", error);
     return new NextResponse("Internal checkout error", { status: 500 });
