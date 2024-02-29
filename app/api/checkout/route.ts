@@ -155,7 +155,7 @@ export async function POST(req: Request) {
       line_items,
       mode: "payment",
       billing_address_collection: "required",
-      success_url: `${process.env.FRONTEND_STORE_URL}/cart?success=true`,
+      success_url: `${process.env.FRONTEND_STORE_URL}/order/${order.orderNumber}?success=true`,
       cancel_url: `${process.env.FRONTEND_STORE_URL}/cart?canceled=true`,
       metadata: {
         orderNumber: order.orderNumber,
