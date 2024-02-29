@@ -18,7 +18,7 @@ export async function GET(
         orderItem: { include: { product: true, design: true, style: true } },
       },
     });
-    console.log(order);
+
     return NextResponse.json(order);
   } catch (error) {
     console.log("[ORDER_GET] error", error);
