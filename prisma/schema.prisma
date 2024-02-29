@@ -83,7 +83,7 @@ model Detail {
 
 model Order {
   id          String      @id @default(uuid())
-  orderNumber String
+  orderNumber String      @unique
   isPaid      Boolean
   profileId   String?
   profile     Profile?    @relation(fields: [profileId], references: [id])
