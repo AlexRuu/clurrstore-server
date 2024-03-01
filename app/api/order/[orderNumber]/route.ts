@@ -15,7 +15,13 @@ export async function GET(
         orderNumber: params.orderNumber,
       },
       include: {
-        orderItem: { include: { product: true, design: true, style: true } },
+        orderItem: {
+          include: {
+            product: { include: { image: true } },
+            design: true,
+            style: true,
+          },
+        },
       },
     });
 
