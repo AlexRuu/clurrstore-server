@@ -146,6 +146,8 @@ export async function POST(req: Request) {
                     },
                   }
                 : undefined,
+            // @ts-expect-error
+            quantity: product.quantity,
           })),
         },
       },
