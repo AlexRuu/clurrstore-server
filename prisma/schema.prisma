@@ -102,6 +102,7 @@ model orderItem {
   design    Design? @relation(fields: [designId], references: [id], onDelete: Cascade)
   styleId   String?
   style     Style?  @relation(fields: [styleId], references: [id], onDelete: Cascade)
+  quantity  Int
   orderId   String
   order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }
