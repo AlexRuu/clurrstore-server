@@ -54,36 +54,46 @@ export async function POST(req: Request) {
         orderItem: true,
       },
     });
-    const productId = order.orderItem.map((item) => item.productId);
-    const designId = order.orderItem.map((item) => item.designId);
-    const filteredDesign = designId.filter(notEmpty);
 
-    // await prismadb.product.updateMany({
-    //   where: {
-    //     id: {
-    //       in: productId,
-    //     },
-    //   },
-    //   data: {
-    //     stock: {
-    //       decrement: 1,
-    //     },
-    //   },
-    // });
+    const designData: string[] = [];
+    for (let x = 0; x < order.orderItem.length; x++) {
+      let toInput: any = {};
+      if (order.orderItem[x].designId != null) {
+        toInput["id"] = order.orderItem[x].designId;
+        toInput["quantity"] = order.orderItem[x].quantity;
+        designData.push(toInput);
+      }
+    }
 
-    await prismadb.$transaction(async (order) => {});
+    console.log(designData);
+    console.log(order.orderItem);
 
-    await prismadb.design.updateMany({
-      where: {
-        id: {
-          in: [...filteredDesign],
-        },
-      },
-      data: {
-        stock: {
-          decrement: 1,
-        },
-      },
+    await prismadb.$transaction(async (tx) => {
+      for (const product of order.orderItem) {
+        await tx.product.update({
+          where: {
+            id: product.productId,
+          },
+          data: {
+            stock: {
+              decrement: product.quantity,
+            },
+          },
+        });
+      }
+
+      for (const design of designData) {
+        await tx.design.update({
+          where: {
+            id: design.id,
+          },
+          data: {
+            stock: {
+              decrement: design.quantity,
+            },
+          },
+        });
+      }
     });
   }
   return new NextResponse(null, { status: 200 });
