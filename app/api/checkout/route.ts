@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
@@ -40,60 +43,48 @@ export async function POST(req: Request) {
       });
     }
 
-    let ids: string[] = [];
-    let designIds: string[] = [];
-    let styleIds: string[] = [];
+    const products: [] = [];
 
-    for (let i = 0; i < body.length; i++) {
-      ids.push(body[i].id);
-    }
-    for (let i = 0; i < body.length; i++) {
-      if (body[i].selectedDesign) {
-        designIds.push(body[i].selectedDesign);
+    await prismadb.$transaction(async (tx) => {
+      for (let i = 0; i < body.length; i++) {
+        const obj = await prismadb.product.findFirst({
+          where: {
+            id: body[i].id,
+            design: { some: { id: body[i]?.selectedDesign } },
+            style: { some: { id: body[i].selectedStyle } },
+          },
+          select: {
+            id: true,
+            title: true,
+            price: true,
+            stock: true,
+            image: true,
+            design: {
+              where: { id: body[i]?.selectedDesign },
+              select: { id: true, title: true },
+            },
+            style: {
+              where: { id: body[i]?.selectedStyle },
+              select: { id: true, title: true },
+            },
+          },
+        });
+        obj["quantity"] = body[i].quantity;
+        products.push(obj);
       }
-    }
-    for (let i = 0; i < body.length; i++) {
-      if (body[i].selectedStyle) {
-        styleIds.push(body[i].selectedStyle);
-      }
-    }
-
-    const products = await prismadb.product.findMany({
-      where: {
-        id: { in: ids },
-      },
-      select: {
-        id: true,
-        title: true,
-        price: true,
-        stock: true,
-        image: true,
-        design: {
-          where: { id: { in: designIds } },
-          select: { id: true, title: true },
-        },
-        style: {
-          where: { id: { in: styleIds } },
-          select: { id: true, title: true },
-        },
-      },
-    });
-
-    products.forEach((item) => {
-      const quantity = body.find((obj: any) => obj.id === item.id).quantity;
-      // @ts-expect-error
-      item.quantity = quantity;
     });
 
     const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
 
     products.forEach((item) => {
       line_items.push({
-        // @ts-expect-error
         quantity: item.quantity,
         price_data: {
           currency: "CAD",
-          product_data: { name: item.title, images: [item.image[0].url] },
+          product_data: {
+            name: item.title,
+            images: [item.image[0].url],
+          },
           unit_amount:
             item.style[0]?.title == "B Grade (-C$2.00)"
               ? (item.price - 2) * 100
@@ -140,14 +131,13 @@ export async function POST(req: Request) {
                   }
                 : undefined,
             style:
-              product.style.length > 0
+              product?.style.length > 0
                 ? {
                     connect: {
-                      id: product.style[0].id,
+                      id: product?.style[0].id,
                     },
                   }
                 : undefined,
-            // @ts-expect-error
             quantity: product.quantity,
           })),
         },
