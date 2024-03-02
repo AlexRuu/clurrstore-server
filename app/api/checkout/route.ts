@@ -43,15 +43,19 @@ export async function POST(req: Request) {
       });
     }
 
-    const products: [] = [];
+    const products = [];
 
     await prismadb.$transaction(async (tx) => {
       for (let i = 0; i < body.length; i++) {
         const obj = await prismadb.product.findFirst({
           where: {
             id: body[i].id,
-            design: { some: { id: body[i]?.selectedDesign } },
-            style: { some: { id: body[i].selectedStyle } },
+            design: body[i].selectedDesign
+              ? { some: { id: body[i]?.selectedDesign } }
+              : undefined,
+            style: body[i].selectedStyle
+              ? { some: { id: body[i]?.selectedStyle } }
+              : undefined,
           },
           select: {
             id: true,

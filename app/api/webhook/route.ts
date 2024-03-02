@@ -5,8 +5,9 @@ import { NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import prismadb from "@/lib/prismadb";
 
-function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
-  return value !== null && value !== undefined;
+interface DesignData {
+  id: string;
+  quantity: number;
 }
 
 export async function POST(req: Request) {
@@ -55,41 +56,33 @@ export async function POST(req: Request) {
       },
     });
 
-    const designData: string[] = [];
+    const designInfo: DesignData[] = [];
     for (let x = 0; x < order.orderItem.length; x++) {
       let toInput: any = {};
       if (order.orderItem[x].designId != null) {
         toInput["id"] = order.orderItem[x].designId;
         toInput["quantity"] = order.orderItem[x].quantity;
-        designData.push(toInput);
+        designInfo.push(toInput);
       }
     }
-
-    console.log(designData);
-    console.log(order.orderItem);
-
     await prismadb.$transaction(async (tx) => {
-      for (const product of order.orderItem) {
+      const item = order.orderItem;
+      for (let i = 0; i < item.length; i++) {
         await tx.product.update({
           where: {
-            id: product.productId,
+            id: item[i].productId,
           },
-          data: {
-            stock: {
-              decrement: product.quantity,
-            },
-          },
+          data: { stock: { decrement: item[i].quantity } },
         });
       }
-
-      for (const design of designData) {
+      for (let j = 0; j < designInfo.length; j++) {
         await tx.design.update({
           where: {
-            id: design.id,
+            id: designInfo[j].id,
           },
           data: {
             stock: {
-              decrement: design.quantity,
+              decrement: designInfo[j].quantity,
             },
           },
         });
