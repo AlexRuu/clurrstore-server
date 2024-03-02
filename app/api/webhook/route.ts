@@ -5,6 +5,10 @@ import { NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import prismadb from "@/lib/prismadb";
 
+function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
+  return value !== null && value !== undefined;
+}
+
 export async function POST(req: Request) {
   const body = await req.text();
   const signature = headers().get("Stripe-Signature") as string;
@@ -51,11 +55,28 @@ export async function POST(req: Request) {
       },
     });
     const productId = order.orderItem.map((item) => item.productId);
+    const designId = order.orderItem.map((item) => item.designId);
+    const filteredDesign = designId.filter(notEmpty);
 
-    await prismadb.product.updateMany({
+    // await prismadb.product.updateMany({
+    //   where: {
+    //     id: {
+    //       in: productId,
+    //     },
+    //   },
+    //   data: {
+    //     stock: {
+    //       decrement: 1,
+    //     },
+    //   },
+    // });
+
+    await prismadb.$transaction(async (order) => {});
+
+    await prismadb.design.updateMany({
       where: {
         id: {
-          in: [...productId],
+          in: [...filteredDesign],
         },
       },
       data: {

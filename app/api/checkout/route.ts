@@ -40,9 +40,9 @@ export async function POST(req: Request) {
       });
     }
 
-    let ids = [];
-    let designIds = [];
-    let styleIds = [];
+    let ids: string[] = [];
+    let designIds: string[] = [];
+    let styleIds: string[] = [];
 
     for (let i = 0; i < body.length; i++) {
       ids.push(body[i].id);
@@ -67,6 +67,7 @@ export async function POST(req: Request) {
         title: true,
         price: true,
         stock: true,
+        image: true,
         design: {
           where: { id: { in: designIds } },
           select: { id: true, title: true },
@@ -92,7 +93,7 @@ export async function POST(req: Request) {
         quantity: item.quantity,
         price_data: {
           currency: "CAD",
-          product_data: { name: item.title },
+          product_data: { name: item.title, images: [item.image[0].url] },
           unit_amount:
             item.style[0]?.title == "B Grade (-C$2.00)"
               ? (item.price - 2) * 100
@@ -157,6 +158,20 @@ export async function POST(req: Request) {
       line_items,
       mode: "payment",
       billing_address_collection: "required",
+      shipping_address_collection: { allowed_countries: ["CA", "US"] },
+      automatic_tax: { enabled: true },
+      shipping_options: [
+        {
+          shipping_rate_data: {
+            display_name: "Standard Shipping",
+            type: "fixed_amount",
+            fixed_amount: {
+              amount: 1200,
+              currency: "CAD",
+            },
+          },
+        },
+      ],
       success_url: `${process.env.FRONTEND_STORE_URL}/order/${order.orderNumber}?success=true`,
       cancel_url: `${process.env.FRONTEND_STORE_URL}/cart?canceled=true`,
       metadata: {
