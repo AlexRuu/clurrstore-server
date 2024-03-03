@@ -90,6 +90,9 @@ model Order {
   address     String      @default("")
   phone       String      @default("")
   orderItem   orderItem[]
+  total       Float
+  shipping    Float
+  tax         Float
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 }

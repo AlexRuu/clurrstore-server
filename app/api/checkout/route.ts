@@ -47,7 +47,7 @@ export async function POST(req: Request) {
 
     await prismadb.$transaction(async (tx) => {
       for (let i = 0; i < body.length; i++) {
-        const obj = await prismadb.product.findFirst({
+        const obj = await tx.product.findFirst({
           where: {
             id: body[i].id,
             design: body[i].selectedDesign
@@ -118,6 +118,8 @@ export async function POST(req: Request) {
     const order = await prismadb.order.create({
       data: {
         orderNumber: randomNumber,
+        shipping: 0,
+        tax: 0,
         isPaid: false,
         orderItem: {
           create: products.map((product) => ({
