@@ -39,6 +39,8 @@ export async function POST(req: Request) {
     address?.postal_code,
     address?.country,
   ];
+  const customerName = session?.customer_details?.name;
+  const customerEmail = session?.customer_details?.email;
 
   const addressString = addressComponents.filter((c) => c !== null).join(", ");
   if (event.type === "checkout.session.completed") {
@@ -50,12 +52,16 @@ export async function POST(req: Request) {
         // @ts-expect-error
         total: session.amount_total / 100,
         // @ts-expect-error
-        tax: session?.total_details?.amount_tax / 100,
+        tax: session.total_details?.amount_tax / 100,
         // @ts-expect-error
         shipping: session.shipping_cost?.amount_subtotal / 100,
+        // @ts-expect-error
+        name: customerName,
+        // @ts-expect-error
+        email: customerEmail,
+        phone: session.customer_details?.phone || "",
         isPaid: true,
         address: addressString,
-        phone: session?.customer_details?.phone || "",
       },
       include: {
         orderItem: true,
@@ -63,15 +69,20 @@ export async function POST(req: Request) {
     });
 
     const designInfo: DesignData[] = [];
+    // @ts-expect-error
     for (let x = 0; x < order.orderItem.length; x++) {
       let toInput: any = {};
+      // @ts-expect-error
       if (order.orderItem[x].designId != null) {
+        // @ts-expect-error
         toInput["id"] = order.orderItem[x].designId;
+        // @ts-expect-error
         toInput["quantity"] = order.orderItem[x].quantity;
         designInfo.push(toInput);
       }
     }
     await prismadb.$transaction(async (tx) => {
+      // @ts-expect-error
       const item = order.orderItem;
       for (let i = 0; i < item.length; i++) {
         await tx.product.update({

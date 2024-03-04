@@ -87,6 +87,8 @@ model Order {
   isPaid      Boolean
   profileId   String?
   profile     Profile?    @relation(fields: [profileId], references: [id])
+  name        String      @default("")
+  email       String      @default("")
   address     String      @default("")
   phone       String      @default("")
   orderItem   orderItem[]
