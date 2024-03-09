@@ -1,6 +1,5 @@
 import prismadb from "@/lib/prismadb";
 import { createClient } from "@/utils/supabase/server";
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 export async function GET(
@@ -33,8 +32,7 @@ export async function PATCH(
   { params }: { params: { productId: string } }
 ) {
   try {
-    const cookieStore = cookies();
-    const supabase = createClient(cookieStore);
+    const supabase = createClient();
 
     const {
       data: { user },
@@ -152,8 +150,7 @@ export async function DELETE(
   { params }: { params: { productId: string } }
 ) {
   try {
-    const cookieStore = cookies();
-    const supabase = createClient(cookieStore);
+    const supabase = createClient();
 
     const {
       data: { user },

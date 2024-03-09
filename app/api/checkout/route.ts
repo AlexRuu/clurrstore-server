@@ -4,7 +4,6 @@
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
-import { cookies } from "next/headers";
 
 import { stripe } from "@/lib/stripe";
 import prismadb from "@/lib/prismadb";

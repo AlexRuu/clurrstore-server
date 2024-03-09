@@ -1,7 +1,6 @@
 import prismadb from "@/lib/prismadb";
 import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
-import { cookies } from "next/headers";
 
 const validateEmail = (email: string) => {
   const regExTest = /^[A-Za-z0-9_!#$%&'*+\/=?`{|}~^.-]+@[A-Za-z0-9.-]+$/gm;
@@ -37,8 +36,7 @@ export async function POST(req: Request) {
 
 export async function GET(req: Request) {
   try {
-    const cookieStore = cookies();
-    const supabase = createClient(cookieStore);
+    const supabase = createClient();
 
     const {
       data: { user },
