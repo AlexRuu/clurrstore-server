@@ -3,7 +3,6 @@
 
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/server";
 
 import { stripe } from "@/lib/stripe";
 import prismadb from "@/lib/prismadb";
@@ -27,16 +26,10 @@ export async function OPTIONS() {
 
 export async function POST(req: Request) {
   try {
-    // const cookieStore = cookies();
-    // const supabase = createClient(cookieStore);
-
-    // const {
-    //   data: { user },
-    // } = await supabase.auth.getUser();
-
     const body = await req.json();
+    const { cart, profile } = body;
 
-    if (!body || body.length === 0) {
+    if (!cart || cart.length === 0) {
       return new NextResponse("Please make sure your cart is not empty", {
         status: 400,
       });
@@ -44,16 +37,24 @@ export async function POST(req: Request) {
 
     const products = [];
 
+    await prismadb.order.deleteMany({
+      where: {
+        isPaid: false,
+        total: 0,
+        shipping: 0,
+      },
+    });
+
     await prismadb.$transaction(async (tx) => {
-      for (let i = 0; i < body.length; i++) {
+      for (let i = 0; i < cart.length; i++) {
         const obj = await tx.product.findFirst({
           where: {
-            id: body[i].id,
-            design: body[i].selectedDesign
-              ? { some: { id: body[i]?.selectedDesign } }
+            id: cart[i].id,
+            design: cart[i].selectedDesign
+              ? { some: { id: cart[i]?.selectedDesign } }
               : undefined,
-            style: body[i].selectedStyle
-              ? { some: { id: body[i]?.selectedStyle } }
+            style: cart[i].selectedStyle
+              ? { some: { id: cart[i]?.selectedStyle } }
               : undefined,
           },
           select: {
@@ -63,16 +64,16 @@ export async function POST(req: Request) {
             stock: true,
             image: true,
             design: {
-              where: { id: body[i]?.selectedDesign },
+              where: { id: cart[i]?.selectedDesign },
               select: { id: true, title: true },
             },
             style: {
-              where: { id: body[i]?.selectedStyle },
+              where: { id: cart[i]?.selectedStyle },
               select: { id: true, title: true },
             },
           },
         });
-        obj["quantity"] = body[i].quantity;
+        obj["quantity"] = cart[i].quantity;
         products.push(obj);
       }
     });
@@ -118,6 +119,11 @@ export async function POST(req: Request) {
       data: {
         orderNumber: randomNumber,
         isPaid: false,
+        profile: profile && {
+          connect: {
+            id: profile,
+          },
+        },
         orderItem: {
           create: products.map((product) => ({
             product: {
@@ -165,13 +171,14 @@ export async function POST(req: Request) {
           },
         },
       ],
-      success_url: `${process.env.FRONTEND_STORE_URL}/order/${order.orderNumber}?success=true`,
-      cancel_url: `${process.env.FRONTEND_STORE_URL}/cart?canceled=true`,
+      success_url: `${process.env.FRONTEND_STORE_URL}/order/${order.orderNumber}?success=1`,
+      cancel_url: `${process.env.FRONTEND_STORE_URL}/cart?canceled=1`,
       metadata: {
         orderNumber: order.orderNumber,
         orderId: order.id,
       },
     });
+
     return NextResponse.json(
       {
         url: session.url,
