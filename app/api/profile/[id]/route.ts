@@ -12,7 +12,11 @@ export async function GET(
     const profile = await prismadb.profile.findFirst({
       where: { id: params.id },
       include: {
-        order: true,
+        order: {
+          where: {
+            isPaid: true,
+          },
+        },
       },
     });
     return NextResponse.json(profile);
