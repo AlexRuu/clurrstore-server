@@ -10,16 +10,16 @@ datasource db {
 model Profile {
   id         String   @id @default(uuid())
   email      String
-  address1   String   @default("")
+  address1   String?  @default("")
   address2   String?  @default("")
-  city       String   @default("")
-  country    String   @default("CA")
+  city       String?  @default("")
+  country    String?  @default("CA")
   createdAt  DateTime @default(now()) @db.Timestamptz(6)
   firstName  String
   lastName   String
-  phone      String   @default("")
-  postalCode String   @default("")
-  province   String   @default("")
+  phone      String?  @default("")
+  postalCode String?  @default("")
+  province   String?  @default("")
   role       Role     @default(USER)
   updatedAt  DateTime @default(now()) @updatedAt @db.Timestamptz(6)
   order      Order[]
