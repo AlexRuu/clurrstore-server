@@ -1,21 +1,19 @@
 import prismadb from "@/lib/prismadb";
 import { createClient } from "@/utils/supabase/server";
-import { cookies } from "next/headers";
 
 import LogoutButton from "@/components/logout-button";
 import NavLinks from "@/components/nav-links";
 
 const Navbar = async () => {
-  const cookieStore = cookies();
-  const supabase = createClient(cookieStore);
+  const supabase = createClient();
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const name = await prismadb.profile.findFirst({
+  const profile = await prismadb.profile.findFirst({
     where: {
-      userId: user?.id,
+      id: user?.id,
     },
   });
 
@@ -26,7 +24,7 @@ const Navbar = async () => {
         <NavLinks />
         {user && (
           <div className="flex items-center justify-center ml-auto space-x-4">
-            Hey, {name?.firstName}!
+            Hey, {profile?.firstName}!
             <LogoutButton />
           </div>
         )}

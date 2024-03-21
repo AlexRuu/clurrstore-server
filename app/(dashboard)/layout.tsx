@@ -1,6 +1,6 @@
 import Navbar from "@/components/navbar";
+import prismadb from "@/lib/prismadb";
 import { createClient } from "@/utils/supabase/server";
-import { cookies } from "next/headers";
 
 import { redirect } from "next/navigation";
 
@@ -9,13 +9,18 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore);
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+  const supabase = createClient();
+  const { data } = await supabase.auth.getUser();
 
-  if (!session) {
+  if (!data.user) {
+    redirect("/login");
+  }
+
+  const profile = await prismadb.profile.findFirst({
+    where: { id: data.user.id, role: "ADMIN" },
+  });
+
+  if (!profile) {
     redirect("/login");
   }
 
