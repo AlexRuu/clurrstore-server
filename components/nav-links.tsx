@@ -20,6 +20,16 @@ const NavLinks = () => {
       label: "Categories",
       active: pathname === "/categories",
     },
+    {
+      href: "/orders",
+      label: "Orders",
+      active: pathname === "/orders",
+    },
+    {
+      href: "/newsletter",
+      label: "Subscribers",
+      active: pathname === "/newsletter",
+    },
   ];
   return (
     <nav className="flex items-center space-x-4 lg:space-x-6 mx-6">
