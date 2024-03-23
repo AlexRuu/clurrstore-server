@@ -11,12 +11,14 @@ const LoginPage = async () => {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const profile = await prismadb.profile.findFirst({
-    where: { id: user?.id, role: "ADMIN" },
-  });
+  if (user) {
+    const profile = await prismadb.profile.findFirst({
+      where: { id: user?.id, role: "ADMIN" },
+    });
 
-  if (profile) {
-    redirect("/");
+    if (profile) {
+      redirect("/");
+    }
   }
 
   return (
