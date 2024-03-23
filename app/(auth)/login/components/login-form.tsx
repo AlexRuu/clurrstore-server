@@ -115,12 +115,6 @@ const LoginForm = () => {
                 Sign In
               </Button>
             </div>
-            <div className="flex text-center mx-auto pt-4">
-              <p className="mr-1">Not a member?</p>
-              <Link href="/account/signup" className="text-blue-500">
-                Sign Up Here
-              </Link>
-            </div>
           </div>
         </form>
       </Form>
