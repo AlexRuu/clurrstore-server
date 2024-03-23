@@ -19,6 +19,7 @@
 # misc
 .DS_Store
 *.pem
+.eslintrc.json
 
 # debug
 npm-debug.log*
@@ -38,4 +39,5 @@ next-env.d.ts
 
 # settings
 .vscode
+
 

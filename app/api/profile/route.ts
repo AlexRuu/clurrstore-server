@@ -22,7 +22,7 @@ export async function POST(req: Request) {
 
     const profile = await prismadb.profile.create({
       data: {
-        userId: user.id,
+        id: user.id,
         email: user.email,
         firstName: user.user_metadata.first_name,
         lastName: user.user_metadata.last_name,

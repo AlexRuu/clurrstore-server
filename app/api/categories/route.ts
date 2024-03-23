@@ -1,6 +1,5 @@
 import prismadb from "@/lib/prismadb";
 import { createClient } from "@/utils/supabase/server";
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 export async function GET(_req: Request) {
@@ -18,8 +17,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { title } = body;
 
-    const cookieStore = cookies();
-    const supabase = createClient(cookieStore);
+    const supabase = createClient();
 
     const {
       data: { user },
