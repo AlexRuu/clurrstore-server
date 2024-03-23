@@ -14,14 +14,14 @@ export default async function DashboardLayout({
 
   if (!data.user) {
     redirect("/login");
-  }
+  } else {
+    const profile = await prismadb.profile.findFirst({
+      where: { id: data.user.id, role: "ADMIN" },
+    });
 
-  const profile = await prismadb.profile.findFirst({
-    where: { id: data.user.id, role: "ADMIN" },
-  });
-
-  if (!profile) {
-    redirect("/login");
+    if (!profile) {
+      redirect("/login");
+    }
   }
 
   return (
