@@ -1,12 +1,12 @@
-# Clurr Store Front End
+# Clurr Store Server
 
-A backend component for an e-commerce project.
+A server for an e-commerce project.
 
 ## Introduction
 
-This is the server component required for the front end project that can be viewed [here](https://clurr-store-front.vercel.app/). This project provides a user interface for the admin to update the products, view an overview of the shop, and update categories related to the products.
+This is the server component required for the front end project that can be viewed [here](https://clurr-store-front.vercel.app/). This project provides a user interface for the admin to update the products, categories, and view other admin related information. It is also the server that allows the front end to retrieve data from the database.
 
-![](https://github.com/AlexRuu/clurrstore-front/blob/main/demo.gif)
+![](https://github.com/AlexRuu/clurrstore-server/blob/main/demo.gif)
 
 ## Getting Started
 
@@ -54,17 +54,19 @@ npm -v # should print `10.2.4`
 ### Installation
 
 ```
-$ git@github.com:AlexRuu/clurrstore-front.git
-$ cd clurrstore-front
+$ git clone git@github.com:AlexRuu/clurrstore-server.git
+$ cd clurrstore-server
 $ npm install
 ```
 
 ### Configure Application
 
 - This application requires the access to the following:
-  - The [server application](https://github.com/AlexRuu/clurrstore-server) for the api route
   - Access to a [Supabase Account](https://supabase.com/)
     - This will require the Supabase project keys that can be accessed in the project settings
+  - Access to a [Stripe](https://stripe.com/en-ca) account
+    - It will require the stripe API keys and webhook secret that are associated with your account
+  - [Cloudinary](https://cloudinary.com/) is also required as it is used to store product images
 
 ### Starting
 
@@ -79,6 +81,7 @@ $ npm run dev
 - Built with [Typescript](https://www.typescriptlang.org/)
 - [Next.js](https://nextjs.org/)
   - [React](https://react.dev/) for the UI
-- [Supabase](<(https://supabase.com/)>) for authentication
+- [Supabase](https://supabase.com/) is used for the database and authentication
 - Styling with [Tailwind CSS](https://tailwindcss.com/)
-- [Stripe](https://stripe.com/en-ca) for the checkout process
+- [Stripe](https://stripe.com/en-ca) is used fo the payment process
+- [Prisma](https://www.prisma.io/) is the ORM used to manipulate the database
