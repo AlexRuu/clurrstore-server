@@ -10,24 +10,15 @@ export const getGraphRevenue = async () => {
     where: {
       isPaid: true,
     },
-    include: {
-      orderItem: {
-        include: {
-          product: true,
-        },
-      },
-    },
   });
 
   const monthlyRevnue: { [key: number]: number } = {};
 
+  let revnueForOrder = 0;
   for (const order of paidOrders) {
     const month = order.createdAt.getMonth();
-    let revnueForOrder = 0;
 
-    for (const item of order.orderItem) {
-      revnueForOrder += item.product.price;
-    }
+    revnueForOrder += order.total;
 
     monthlyRevnue[month] = (monthlyRevnue[month] || 0) + revnueForOrder;
   }
